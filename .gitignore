@@ -1,0 +1,16 @@
+
+*.csv
+*.xlsx
+*.pkl
+*.joblib
+data/
+__pycache__/
+*.pyc
+.env
+credit_scoring_env/
+.ipynb_checkpoints/
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+mlflow/mlruns/
+profiles.yml
