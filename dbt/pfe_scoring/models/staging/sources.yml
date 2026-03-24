@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: raw
+    database: pfe_credit_dw
+    schema: raw
+    tables:
+      - name: flag_transfo
+      - name: table_signaletique
+      - name: table_affaire
+      - name: table_reclamation
+      - name: table_sav
+      - name: table_ciblage
+      - name: table_demande_info

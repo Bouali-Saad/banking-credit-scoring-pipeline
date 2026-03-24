@@ -1,0 +1,44 @@
+name: 'pfe_scoring'
+version: '1.0.0'
+profile: 'pfe_scoring'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  pfe_scoring:
+    staging:
+      +materialized: view
+      +schema: staging
+    intermediate:
+      +materialized: view
+      +schema: intermediate
+    marts:
+      +materialized: table
+      +schema: marts
+```
+
+---
+
+## Explication des changements
+```
+staging     → materialized: view
+→ Données nettoyées = juste une vue
+→ Pas de duplication
+
+intermediate → materialized: view
+→ Features par table = vue
+→ Léger et rapide
+
+marts       → materialized: table
+→ Dataset ML final = vraie TABLE
+→ Sauvegardée dans PostgreSQL
+→ Prête pour le ML !
