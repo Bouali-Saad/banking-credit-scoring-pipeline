@@ -1,7 +1,7 @@
 
 
 WITH source AS (
-    SELECT * FROM {{ source('raw', 'table_reclamation') }}
+    SELECT * FROM {{ source('raw', 'table_sav') }}
 ),
 
 cleaned AS (
@@ -14,6 +14,7 @@ cleaned AS (
         TRIM(NUM_AFFAIRE)                       AS num_affaire,
         TRIM(TIERS_SOCIETE)                     AS tiers_societe,
         TRIM(AGENCE_CREATION)                   AS agence_creation,
+        TRIM(SRC)                               AS src,
 
         
         TRIM(CATEGORIE)                         AS categorie,
