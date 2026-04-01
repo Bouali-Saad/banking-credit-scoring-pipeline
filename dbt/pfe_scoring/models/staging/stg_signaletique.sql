@@ -32,7 +32,7 @@ cleaned AS (
 
         DATE_ENT_RELATION                           AS date_entree,
         DATE_DERNIER_EVT                            AS date_dernier_evt,
-        DATE_EMBAUCHE                               AS date_embouche
+        DATE_EMBAUCHE                               AS date_embauche
     FROM source
     WHERE TIERS_CLIENT IS NOT NULL
 )
