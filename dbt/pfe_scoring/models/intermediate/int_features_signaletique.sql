@@ -5,10 +5,10 @@ WITH source AS (
 ),
 
 deduped AS (
-    SELECT DISTINCT ON (tiers_client, period_trt)
+    SELECT DISTINCT ON (tiers_client, periode_trt)
         tiers_client,
         id_tiers_siebel,
-        period_trt,
+        periode_trt,
 
         
         age,
@@ -16,7 +16,6 @@ deduped AS (
         nbr_enfant,
         charges,
         mensualite_loyer,
-        flag_eligible_md,
 
         
         csp_mkt,
@@ -27,7 +26,6 @@ deduped AS (
         type_client,
         activite_profession,
         dernier_evt,
-        type_prel_prioritaire,
 
         
         EXTRACT(YEAR FROM AGE(CURRENT_DATE,
@@ -35,17 +33,40 @@ deduped AS (
                 NULLIF(TRIM(date_entree::text), ''),
                 'DDMONYYYY:HH24:MI:SS'
             )
-        ))::numeric                     AS anciennete_annees,
+        ))::numeric                         AS anciennete_annees,
 
         
-        date_entree,
-        date_dernier_evt,
-        date_embauche
+        EXTRACT(YEAR FROM AGE(CURRENT_DATE,
+            TO_TIMESTAMP(
+                NULLIF(TRIM(date_embauche::text), ''),
+                'DDMONYYYY:HH24:MI:SS'
+            )
+        ))::numeric                         AS anciennete_emploi,
+
+        
+        EXTRACT(DAY FROM CURRENT_DATE -
+            TO_TIMESTAMP(
+                NULLIF(TRIM(date_dernier_evt::text), ''),
+                'DDMONYYYY:HH24:MI:SS'
+            )
+        )::numeric                          AS nb_jours_dernier_evt,
+
+        
+        EXTRACT(DAY FROM
+            TO_TIMESTAMP(
+                NULLIF(TRIM(date_trt_extr::text), ''),
+                'DDMONYYYY:HH24:MI:SS') -
+            TO_TIMESTAMP(
+                NULLIF(TRIM(date_entree::text), ''),
+                'DDMONYYYY:HH24:MI:SS')
+        )::numeric                          AS delai_extraction
+
+        
 
     FROM source
     WHERE tiers_client IS NOT NULL
     ORDER BY tiers_client,
-             period_trt,
+             periode_trt,
              date_entree DESC NULLS LAST
 )
 

@@ -7,7 +7,7 @@ cleaned AS (
     SELECT
         TIERS_CLIENT                                AS tiers_client,
         ID_TIERS_SIEBEL                             AS id_tiers_siebel,
-        TRIM(PERIODE_TRT)                           AS period_trt,
+        TRIM(PERIODE_TRT)                           AS periode_trt,
         DATE_TRT_EXTR                               AS date_trt_extr,
 
         NULLIF(TRIM(AGE_CLIENT), '')::numeric       AS age,
