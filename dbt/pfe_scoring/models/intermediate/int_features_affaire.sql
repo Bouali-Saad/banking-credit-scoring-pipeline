@@ -1,4 +1,3 @@
-
 WITH source AS (
     SELECT * FROM {{ ref('stg_affaire') }}
 )
@@ -40,13 +39,13 @@ SELECT
     AVG(nbr_ech_rest)                                       AS moy_nbr_ech_rest,
     AVG(COALESCE(differe, 0))                               AS moy_differe,
 
-    -- ═══ FLAGS IMPAYÉS ═══
+    
     MAX(CASE WHEN COALESCE(nb_impaye, 0) > 0
              THEN 1 ELSE 0 END)                             AS flag_impaye,
     MAX(CASE WHEN COALESCE(mt_encours_ctx, 0) > 0
              THEN 1 ELSE 0 END)                             AS flag_contentieux,
 
-    -- ═══ FLAGS PRODUIT ═══
+    
     MAX(CASE WHEN UPPER(produit_wfs) LIKE '%AUTO%'
              THEN 1 ELSE 0 END)                             AS flag_credit_auto,
     MAX(CASE WHEN UPPER(produit_wfs) LIKE '%EQUIPEMENT%'
@@ -55,16 +54,16 @@ SELECT
              OR UPPER(produit_wfs) LIKE '%PERSONNEL%'
              THEN 1 ELSE 0 END)                             AS flag_credit_perso,
 
-    -- ═══ FLAG PRÉLÈVEMENT ═══
+   
     MAX(CASE WHEN UPPER(type_prel_actuel)
              LIKE '%PRELEVEMENT%'
              THEN 1 ELSE 0 END)                             AS flag_prel_prelevement,
 
-    -- ═══ CONTENTIEUX ═══
+    
     SUM(CASE WHEN date_entree_ctx IS NOT NULL
              THEN 1 ELSE 0 END)                             AS nb_credits_ctx,
 
-    -- ═══ RETARD ÉCHÉANCE ═══
+    
     AVG(CASE WHEN date_ech_reel IS NOT NULL
              AND date_ech_init IS NOT NULL
              THEN EXTRACT(DAY FROM
@@ -74,20 +73,24 @@ SELECT
                                'DDMONYYYY:HH24:MI:SS'))
              ELSE NULL END)                                 AS moy_retard_echeance,
 
-    -- ═══ DÉLAI EXTRACTION ═══
+    
     AVG(CASE WHEN date_trt_extr IS NOT NULL
-             AND date_mep IS NOT NULL
-             THEN EXTRACT(DAY FROM
-                  TO_TIMESTAMP(NULLIF(TRIM(date_trt_extr::text),''),
-                               'DDMONYYYY:HH24:MI:SS') -
-                  TO_TIMESTAMP(NULLIF(TRIM(date_mep::text),''),
-                               'DDMONYYYY:HH24:MI:SS'))
-             ELSE NULL END)                                 AS moy_delai_extraction,
+         AND date_mep IS NOT NULL
+         THEN EXTRACT(DAY FROM
+              date_trt_extr -
+              TO_TIMESTAMP(NULLIF(TRIM(date_mep::text),''),
+                           'DDMONYYYY:HH24:MI:SS'))
+         ELSE NULL END)                         AS moy_delai_extraction,
 
-    -- ═══ CATÉGORIELLES ═══
+    MIN(date_trt_extr)                          AS date_trt_extr,
+
+    
     MODE() WITHIN GROUP (ORDER BY canal_prov)               AS canal_prov_principal,
     MODE() WITHIN GROUP (ORDER BY code_reseau)              AS code_reseau_principal,
     MODE() WITHIN GROUP (ORDER BY type_bien)                AS type_bien_principal
+
+    
+    
 
 FROM source
 WHERE tiers_client IS NOT NULL

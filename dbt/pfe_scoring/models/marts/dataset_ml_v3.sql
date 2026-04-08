@@ -1,5 +1,3 @@
-
-
 {{ config(materialized='table') }}
 
 WITH
@@ -43,12 +41,13 @@ final AS (
         
         f.flag_transfo,
 
-        -- ═══ (signaletique) ═══
+        
         s.age,
         s.revenu,
         s.nbr_enfant,
         s.charges,
         s.mensualite_loyer,
+        s.flag_eligible_md,
         s.csp_mkt,
         s.secteur_activite,
         s.civilite_client,
@@ -60,9 +59,8 @@ final AS (
         s.anciennete_annees,
         s.anciennete_emploi,
         s.nb_jours_dernier_evt,
-        s.delai_extraction          AS sig_delai_extraction,
 
-        -- ═══ (affaire) ═══
+        
         a.nb_credits,
         a.moy_mt_init_brut,
         a.moy_mt_cap_rest,
@@ -90,12 +88,12 @@ final AS (
         a.flag_prel_prelevement,
         a.nb_credits_ctx,
         a.moy_retard_echeance,
-        a.moy_delai_extraction      AS aff_delai_extraction,
+        a.moy_delai_extraction      AS aff_moy_delai_extraction,
         a.canal_prov_principal,
         a.code_reseau_principal,
         a.type_bien_principal,
 
-        -- ═══ (ciblage) ═══
+        
         c.nb_campagnes,
         c.nb_contacts_total,
         c.nb_jours_cibles,
@@ -106,7 +104,7 @@ final AS (
         c.nb_voice_failed,
         c.flag_canal_voice,
 
-        -- ═══ SAV ═══
+        
         sv.nb_sav,
         sv.nb_agences               AS sav_nb_agences,
         sv.nb_affaires              AS sav_nb_affaires,
@@ -132,14 +130,14 @@ final AS (
         sv.date_premier_sav,
         sv.date_dernier_sav,
 
-        -- ═══ RÉCLAMATIONS ═══
+        
         r.nb_reclamations,
         r.flag_double_prelevement,
         r.nb_recla_non_clotures,
-        r.date_premiere_recla,      
-        r.date_derniere_recla,      
+        r.date_premiere_recla,
+        r.date_derniere_recla,
 
-        -- ═══ DEMANDES INFO ═══
+        
         d.nb_demandes,
         d.flag_demande_pret,
         d.flag_sav                  AS dem_flag_sav,
@@ -148,36 +146,40 @@ final AS (
         d.flag_report_echeance      AS dem_flag_report_echeance,
         d.flag_rachat_credit,
         d.moy_delai_extraction      AS dem_moy_delai_extraction,
-        d.date_premiere_demande,    
-        d.date_derniere_demande    
+        d.date_premiere_demande,
+        d.date_derniere_demande,
+
+        
+      
+        LEAST(
+    s.date_trt_extr,
+    a.date_trt_extr,
+    sv.date_trt_extr,
+    r.date_trt_extr,
+    d.date_trt_extr
+)                           AS date_trt_extr_global
 
     FROM flag f
 
-    -- Profil client par période
     LEFT JOIN sig s
         ON f.tiers_client = s.tiers_client
         AND f.periode_trt = s.periode_trt
 
-    -- Crédits par période
     LEFT JOIN aff a
         ON f.tiers_client = a.tiers_client
         AND f.periode_trt = a.periode_trt
 
-    -- Campagnes 
     LEFT JOIN cib c
         ON f.tiers_client = c.tiers_client
 
-    -- SAV via id_tiers_siebel
     LEFT JOIN sav sv
         ON s.id_tiers_siebel = sv.id_tiers_siebel
         AND f.periode_trt = sv.periode_trt
 
-    -- Réclamations via id_tiers_siebel
     LEFT JOIN recla r
         ON s.id_tiers_siebel = r.id_tiers_siebel
         AND f.periode_trt = r.periode_trt
 
-    -- Demandes via id_tiers_siebel
     LEFT JOIN dem d
         ON s.id_tiers_siebel = d.id_tiers_siebel
         AND f.periode_trt = d.periode_trt

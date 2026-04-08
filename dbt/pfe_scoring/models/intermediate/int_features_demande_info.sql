@@ -1,7 +1,4 @@
--- ================================================================
--- INTERMEDIATE : int_features_demande_info (Silver)
--- 8 variables confirmées par tests statistiques
--- ================================================================
+
 
 WITH source AS (
     SELECT * FROM {{ ref('stg_demande_info') }}
@@ -11,7 +8,7 @@ SELECT
     id_tiers_siebel,
     periode_trt,
 
-    
+   
     COUNT(DISTINCT id_demande)                      AS nb_demandes,
 
     
@@ -23,7 +20,7 @@ SELECT
              LIKE '%SAV%'
              THEN 1 ELSE 0 END)                     AS flag_sav,
 
-    
+    -- ═══ FLAGS SOUS_CATEGORIE ═══
     MAX(CASE WHEN UPPER(sous_categorie)
              LIKE '%SIMULATION%'
              THEN 1 ELSE 0 END)                     AS flag_simulation,
@@ -42,17 +39,20 @@ SELECT
 
     
     AVG(EXTRACT(DAY FROM
-        TO_TIMESTAMP(
-            NULLIF(TRIM(date_trt_extr::text), ''),
-            'DDMONYYYY:HH24:MI:SS') -
-        TO_TIMESTAMP(
-            NULLIF(TRIM(date_creation::text), ''),
-            'DDMONYYYY:HH24:MI:SS')
+    date_trt_extr -
+    TO_TIMESTAMP(
+        NULLIF(TRIM(date_creation::text), ''),
+        'DDMONYYYY:HH24:MI:SS')
     ))                                              AS moy_delai_extraction,
+
+     MIN(date_trt_extr)                             AS date_trt_extr,
 
     
     MIN(date_creation)                              AS date_premiere_demande,
     MAX(date_creation)                              AS date_derniere_demande
+
+    
+    
 
 FROM source
 WHERE id_tiers_siebel IS NOT NULL

@@ -11,7 +11,10 @@ cleaned AS (
     SELECT
         TIERS_CLIENT                            AS tiers_client,
         PERIODE_TRT                             AS periode_trt,
-        DATE_TRT_EXTR                           AS date_trt_extr,
+        TO_TIMESTAMP(
+                         NULLIF(TRIM(DATE_TRT_EXTR::text),''),
+                        'DDMONYYYY:HH24:MI:SS'
+                    )                                           AS date_trt_extr,
         flag_transfo::int                       AS flag_transfo,
         CASE WHEN PERIODE_TRT = '012026'
              THEN 1 ELSE 0 END                  AS is_prediction_period

@@ -1,5 +1,3 @@
-
-
 WITH source AS (
     SELECT * FROM {{ ref('stg_signaletique') }}
 ),
@@ -9,15 +7,23 @@ deduped AS (
         tiers_client,
         id_tiers_siebel,
         periode_trt,
+        date_trt_extr,
 
-        
+        -- Variables numériques
         age,
         revenu,
         nbr_enfant,
         charges,
         mensualite_loyer,
 
-        
+        -- ✅ FLAG_ELIGIBLE_MD réintégré !
+        CASE WHEN UPPER(TRIM(flag_eligible_md::text)) = 'O'
+             THEN 1
+             WHEN UPPER(TRIM(flag_eligible_md::text)) = 'N'
+             THEN 0
+             ELSE NULL END                      AS flag_eligible_md,
+
+        -- Variables catégorielles
         csp_mkt,
         secteur_activite,
         civilite_client,
@@ -27,41 +33,27 @@ deduped AS (
         activite_profession,
         dernier_evt,
 
-        
+        -- Features calculées
         EXTRACT(YEAR FROM AGE(CURRENT_DATE,
             TO_TIMESTAMP(
                 NULLIF(TRIM(date_entree::text), ''),
                 'DDMONYYYY:HH24:MI:SS'
             )
-        ))::numeric                         AS anciennete_annees,
+        ))::numeric                             AS anciennete_annees,
 
-        
         EXTRACT(YEAR FROM AGE(CURRENT_DATE,
             TO_TIMESTAMP(
                 NULLIF(TRIM(date_embauche::text), ''),
                 'DDMONYYYY:HH24:MI:SS'
             )
-        ))::numeric                         AS anciennete_emploi,
+        ))::numeric                             AS anciennete_emploi,
 
-        
         EXTRACT(DAY FROM CURRENT_DATE -
             TO_TIMESTAMP(
                 NULLIF(TRIM(date_dernier_evt::text), ''),
                 'DDMONYYYY:HH24:MI:SS'
             )
-        )::numeric                          AS nb_jours_dernier_evt,
-
-        
-        EXTRACT(DAY FROM
-            TO_TIMESTAMP(
-                NULLIF(TRIM(date_trt_extr::text), ''),
-                'DDMONYYYY:HH24:MI:SS') -
-            TO_TIMESTAMP(
-                NULLIF(TRIM(date_entree::text), ''),
-                'DDMONYYYY:HH24:MI:SS')
-        )::numeric                          AS delai_extraction
-
-        
+        )::numeric                              AS nb_jours_dernier_evt
 
     FROM source
     WHERE tiers_client IS NOT NULL

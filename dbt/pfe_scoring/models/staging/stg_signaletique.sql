@@ -1,4 +1,3 @@
-
 WITH source AS (
     SELECT * FROM {{ source('raw', 'table_signaletique') }}
 ),
@@ -8,14 +7,17 @@ cleaned AS (
         TIERS_CLIENT                                AS tiers_client,
         ID_TIERS_SIEBEL                             AS id_tiers_siebel,
         TRIM(PERIODE_TRT)                           AS periode_trt,
-        DATE_TRT_EXTR                               AS date_trt_extr,
+       TO_TIMESTAMP(
+          NULLIF(TRIM(DATE_TRT_EXTR::text),''),
+               'DDMONYYYY:HH24:MI:SS'
+                    )                                           AS date_trt_extr,
 
         NULLIF(TRIM(AGE_CLIENT), '')::numeric       AS age,
         NULLIF(TRIM(REVENU_MENSUEL), '')::numeric   AS revenu,
         NULLIF(TRIM(NBR_ENFANT), '')::numeric       AS nbr_enfant,
         NULLIF(TRIM(CHARGES_CLIE), '')::numeric     AS charges,
         NULLIF(TRIM(MENSUALITE_LOYER), '')::numeric AS mensualite_loyer,
-        
+
         CASE WHEN FLAG_ELIGIBLE_MD ~ '^[0-9]+$'
              THEN FLAG_ELIGIBLE_MD::numeric
              ELSE 0 END                             AS flag_eligible_md,
@@ -33,8 +35,15 @@ cleaned AS (
         DATE_ENT_RELATION                           AS date_entree,
         DATE_DERNIER_EVT                            AS date_dernier_evt,
         DATE_EMBAUCHE                               AS date_embauche
+
     FROM source
     WHERE TIERS_CLIENT IS NOT NULL
+    
+    AND (
+        DATE_TRT_EXTR IS NULL
+        OR DATE_ENT_RELATION IS NULL
+        OR DATE_TRT_EXTR::text >= DATE_ENT_RELATION::text
+    )
 )
 
 SELECT * FROM cleaned
