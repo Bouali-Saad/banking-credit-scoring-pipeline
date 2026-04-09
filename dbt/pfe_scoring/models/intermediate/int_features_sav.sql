@@ -7,12 +7,12 @@ SELECT
     id_tiers_siebel,
     periode_trt,
 
-    -- ═══ COMPTAGES ═══
+    
     COUNT(*)                                        AS nb_sav,
     COUNT(DISTINCT agence_creation)                 AS nb_agences,
     COUNT(DISTINCT num_affaire)                     AS nb_affaires,
 
-    -- ═══ FLAGS CATEGORIE ═══
+    
     MAX(CASE WHEN UPPER(categorie)
              LIKE '%RECOUVREMENT%'
              THEN 1 ELSE 0 END)                     AS flag_recouvrement,
@@ -58,7 +58,7 @@ SELECT
              LIKE '%REPORT%ECHEANCE%'
              THEN 1 ELSE 0 END)                     AS flag_report_echeance,
 
-    -- ═══ FLAGS STATUT ═══
+    
     MAX(CASE WHEN UPPER(statut_demande)
              IN ('OUVERTE', 'EN COURS',
                  'EN ATTENTE', 'INITIEE',
@@ -76,7 +76,7 @@ SELECT
                  'EN_ECHEC', 'DOUBLON')
              THEN 1 ELSE 0 END)                     AS flag_sav_annule,
 
-    -- ═══ FLAGS CANAL ═══
+    
     MAX(CASE WHEN UPPER(canal) LIKE '%TEL%'
              THEN 1 ELSE 0 END)                     AS flag_canal_tel,
 
@@ -84,7 +84,7 @@ SELECT
     MIN(date_creation)                              AS date_premier_sav,
     MAX(date_creation)                              AS date_dernier_sav,
 
-    -- ═══ DURÉE TRAITEMENT ═══
+    
     AVG(CASE WHEN date_fin IS NOT NULL
              THEN EXTRACT(DAY FROM
                   TO_TIMESTAMP(NULLIF(TRIM(date_fin::text), ''),
@@ -106,9 +106,9 @@ SELECT
     date_trt_extr -
     TO_TIMESTAMP(NULLIF(TRIM(date_creation::text), ''),
                  'DDMONYYYY:HH24:MI:SS')
-))                                              AS moy_delai_extraction,
+))                                              AS moy_delai_extraction
 
-MIN(date_trt_extr)                              AS date_trt_extr
+
 
 
 FROM source

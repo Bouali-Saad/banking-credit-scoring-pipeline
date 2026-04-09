@@ -151,13 +151,7 @@ final AS (
 
         
       
-        LEAST(
-    s.date_trt_extr,
-    a.date_trt_extr,
-    sv.date_trt_extr,
-    r.date_trt_extr,
-    d.date_trt_extr
-)                           AS date_trt_extr_global
+        f.date_trt_extr                 AS date_trt_extr_global
 
     FROM flag f
 

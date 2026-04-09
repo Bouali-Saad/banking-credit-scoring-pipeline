@@ -82,7 +82,7 @@ SELECT
                            'DDMONYYYY:HH24:MI:SS'))
          ELSE NULL END)                         AS moy_delai_extraction,
 
-    MIN(date_trt_extr)                          AS date_trt_extr,
+    
 
     
     MODE() WITHIN GROUP (ORDER BY canal_prov)               AS canal_prov_principal,

@@ -45,7 +45,7 @@ SELECT
         'DDMONYYYY:HH24:MI:SS')
     ))                                              AS moy_delai_extraction,
 
-     MIN(date_trt_extr)                             AS date_trt_extr,
+     
 
     
     MIN(date_creation)                              AS date_premiere_demande,

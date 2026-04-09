@@ -1,6 +1,4 @@
--- ================================================================
--- INTERMEDIATE : int_features_flag_transfo (Silver)
--- ================================================================
+
 
 WITH source AS (
     SELECT * FROM {{ ref('stg_flag_transfo') }}
