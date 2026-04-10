@@ -6,9 +6,6 @@ WITH source AS (
 
 SELECT
     id_tiers_siebel,
-    periode_trt,
-
-    
     COUNT(DISTINCT id_demande)              AS nb_reclamations,
 
     MAX(CASE WHEN UPPER(sous_categorie)
@@ -35,4 +32,4 @@ SELECT
 
 FROM source
 WHERE id_tiers_siebel IS NOT NULL
-GROUP BY id_tiers_siebel, periode_trt
+GROUP BY id_tiers_siebel
