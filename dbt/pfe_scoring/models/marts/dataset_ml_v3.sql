@@ -39,7 +39,7 @@ SELECT
     s.anciennete_emploi,
     s.nb_jours_dernier_evt,
 
-   
+    
     a.nb_credits,
     a.moy_mt_init_brut,
     a.moy_mt_cap_rest,
@@ -126,7 +126,33 @@ SELECT
     d.flag_rachat_credit,
     d.moy_delai_extraction                      AS dem_moy_delai_extraction,
     d.date_premiere_demande,
-    d.date_derniere_demande
+    d.date_derniere_demande,
+
+   
+
+   
+    CASE
+        WHEN s.revenu IS NULL OR s.revenu = 0 THEN NULL
+        ELSE ROUND((a.moy_mensualite / s.revenu)::numeric, 4)
+    END                                         AS taux_endettement,
+
+    -- 2. Score risque client (0=sain, 1=léger, 2=sérieux, 3=critique)
+    COALESCE(a.flag_impaye, 0)
+    + COALESCE(sv.flag_recouvrement, 0)
+    + COALESCE(a.flag_contentieux, 0)           AS score_risque,
+
+   
+    CASE
+        WHEN a.moy_mt_init_brut IS NULL OR a.moy_mt_init_brut = 0 THEN NULL
+        ELSE ROUND((a.moy_mt_cap_rest / a.moy_mt_init_brut)::numeric, 4)
+    END                                         AS ratio_remboursement,
+
+    -- 4. Flag nouveau client (ancienneté < 2 ans)
+    CASE
+        WHEN s.anciennete_annees IS NULL THEN NULL
+        WHEN s.anciennete_annees < 2     THEN 1
+        ELSE 0
+    END                                         AS flag_nouveau_client
 
 FROM f
 
