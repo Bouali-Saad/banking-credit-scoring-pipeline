@@ -20,7 +20,7 @@ SELECT
     f.flag_transfo,
     f.date_trt_extr                                     AS date_trt_extr_global,
 
-    
+   
     s.age,
     s.revenu,
     s.nbr_enfant,
@@ -31,10 +31,9 @@ SELECT
     s.anciennete_emploi,
     s.nb_jours_dernier_evt,
 
-   
-    s.csp_mkt,           
+     s.csp_mkt,           
     s.type_client,       
-   
+
     CASE
         WHEN s.civilite_client = 'Monsieur'                     THEN 'HOMME'
         WHEN s.civilite_client IN ('Madame', 'Mademoiselle')    THEN 'FEMME'
@@ -53,7 +52,7 @@ SELECT
         ELSE                                                         'AUTRES_PRODUITS'
     END                                                         AS groupe_produit,
 
-   
+    
     CASE
         WHEN s.dernier_evt = 'Demande de credit'                THEN 'DEMANDE_CREDIT'
         WHEN s.dernier_evt = 'Demande de reclamation'           THEN 'RECLAMATION'
@@ -61,18 +60,13 @@ SELECT
         ELSE                                                         'AUTRE_EVT'
     END                                                         AS groupe_dernier_evt,
 
-    
+   
     CASE
         WHEN a.canal_prov_principal IN ('MAILING','TELEMARKET','AFFICHAGE',
                                         'DEPLIANT','BOUCHE A O','ENTREPRISE',
-                                        'SALON')                THEN 'CANAL_ACTIF'
-        WHEN a.canal_prov_principal IN ('ARCW','ARCD')          THEN 'CANAL_ARC'
-        WHEN a.canal_prov_principal IN ('PARRAINNAE','PRON_PAS','TV','NO VERT',
-                                        'INTERNET','PRESSE','1118','RADIO',
-                                        '1103','CRC','SMS')     THEN 'CANAL_INACTIF'
-        WHEN a.canal_prov_principal IS NULL                     THEN 'INCONNU'
-        ELSE                                                         'AUTRES'
-    END                                                         AS groupe_canal_prov,
+                                        'SALON')                THEN 1
+        ELSE                                                         0
+    END                                                         AS flag_canal_actif,
 
     
     CASE
@@ -93,7 +87,7 @@ SELECT
         ELSE                                                         'AUTRES'
     END                                                         AS groupe_reseau,
 
-   
+    
     a.nb_credits,
     a.moy_mt_init_brut,
     a.moy_mt_cap_rest,
@@ -134,7 +128,7 @@ SELECT
     c.nb_voice_failed,
     c.flag_canal_voice,
 
-   
+    
     sv.nb_sav,
     sv.nb_agences                                               AS sav_nb_agences,
     sv.nb_affaires                                              AS sav_nb_affaires,
@@ -173,7 +167,7 @@ SELECT
     d.flag_rachat_credit,
     d.moy_delai_extraction                                      AS dem_moy_delai_extraction,
 
-   
+    
     CASE
         WHEN s.revenu IS NULL OR s.revenu = 0 THEN NULL
         ELSE ROUND((a.moy_mensualite / s.revenu)::numeric, 4)
@@ -190,7 +184,7 @@ SELECT
         ELSE ROUND((a.moy_mt_cap_rest / a.moy_mt_init_brut)::numeric, 4)
     END                                                         AS ratio_remboursement,
 
-   
+    
     CASE
         WHEN s.anciennete_annees IS NULL THEN NULL
         WHEN s.anciennete_annees < 2     THEN 1
@@ -208,6 +202,7 @@ SELECT
     END                                                         AS recence_sav,
 
     
+    
     CASE
         WHEN r.date_derniere_recla IS NULL THEN NULL
         WHEN TO_TIMESTAMP(NULLIF(TRIM(r.date_derniere_recla::text),''),
@@ -217,7 +212,8 @@ SELECT
                                   'DDMONYYYY:HH24:MI:SS'))::numeric
     END                                                         AS recence_recla,
 
-   
+    
+    
     CASE
         WHEN d.date_derniere_demande IS NULL THEN NULL
         WHEN TO_TIMESTAMP(NULLIF(TRIM(d.date_derniere_demande::text),''),
