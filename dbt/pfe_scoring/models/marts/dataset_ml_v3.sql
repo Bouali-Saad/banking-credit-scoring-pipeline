@@ -230,7 +230,8 @@ LEFT JOIN s  ON f.tiers_client    = s.tiers_client    AND f.periode_trt = s.peri
 LEFT JOIN a  ON f.tiers_client    = a.tiers_client    AND f.periode_trt = a.periode_trt
 
 
-LEFT JOIN c  ON f.tiers_client    = c.tiers_client
+LEFT JOIN c ON f.tiers_client = c.tiers_client
+           AND f.periode_trt  = c.periode_trt
 LEFT JOIN sv ON s.id_tiers_siebel = sv.id_tiers_siebel
 LEFT JOIN r  ON s.id_tiers_siebel = r.id_tiers_siebel
 LEFT JOIN d  ON s.id_tiers_siebel = d.id_tiers_siebel
