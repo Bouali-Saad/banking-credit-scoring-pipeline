@@ -20,7 +20,7 @@ SELECT
     f.flag_transfo,
     f.date_trt_extr                                     AS date_trt_extr_global,
 
-   
+    
     s.age,
     s.revenu,
     s.nbr_enfant,
@@ -30,9 +30,8 @@ SELECT
     s.anciennete_annees,
     s.anciennete_emploi,
     s.nb_jours_dernier_evt,
-
-     s.csp_mkt,           
-    s.type_client,       
+    s.csp_mkt,
+    s.type_client,
 
     CASE
         WHEN s.civilite_client = 'Monsieur'                     THEN 'HOMME'
@@ -41,7 +40,6 @@ SELECT
         ELSE                                                         'PERSONNE_MORALE'
     END                                                         AS groupe_civilite,
 
-    
     CASE
         WHEN s.prem_produit = 'Credit des menages'              THEN 'CREDIT_MENAGES'
         WHEN s.prem_produit = 'Credit Auto'                     THEN 'CREDIT_AUTO'
@@ -52,7 +50,6 @@ SELECT
         ELSE                                                         'AUTRES_PRODUITS'
     END                                                         AS groupe_produit,
 
-    
     CASE
         WHEN s.dernier_evt = 'Demande de credit'                THEN 'DEMANDE_CREDIT'
         WHEN s.dernier_evt = 'Demande de reclamation'           THEN 'RECLAMATION'
@@ -60,7 +57,6 @@ SELECT
         ELSE                                                         'AUTRE_EVT'
     END                                                         AS groupe_dernier_evt,
 
-   
     CASE
         WHEN a.canal_prov_principal IN ('MAILING','TELEMARKET','AFFICHAGE',
                                         'DEPLIANT','BOUCHE A O','ENTREPRISE',
@@ -68,7 +64,6 @@ SELECT
         ELSE                                                         0
     END                                                         AS flag_canal_actif,
 
-    
     CASE
         WHEN a.code_reseau_principal IN ('BMW','AUDI','MERC','ALFA','JAGU',
                                          'LAND','VOLV','ROVE','CADI')
@@ -109,9 +104,31 @@ SELECT
     a.moy_differe,
     a.flag_impaye,
     a.flag_contentieux,
+
+   
     a.flag_credit_auto,
     a.flag_credit_equip,
     a.flag_credit_perso,
+    a.flag_credit_renouvelable,                                 
+
+    
+    a.nb_credits_equip,
+    a.nb_credits_auto,
+    a.nb_credits_renouvelable,
+    a.nb_credits_perso,
+
+    
+    a.sum_mt_equip,
+    a.sum_mt_auto,
+    a.sum_mt_renouvelable,
+    a.sum_mt_perso,
+
+    
+    a.avg_mt_equip,
+    a.avg_mt_auto,
+    a.avg_mt_renouvelable,
+    a.avg_mt_perso,
+
     a.flag_prel_prelevement,
     a.nb_credits_ctx,
     a.moy_retard_echeance,
@@ -167,31 +184,27 @@ SELECT
     d.flag_rachat_credit,
     d.moy_delai_extraction                                      AS dem_moy_delai_extraction,
 
-    
+    -- Features engineerées
     CASE
         WHEN s.revenu IS NULL OR s.revenu = 0 THEN NULL
         ELSE ROUND((a.moy_mensualite / s.revenu)::numeric, 4)
     END                                                         AS taux_endettement,
 
-    
     COALESCE(a.flag_impaye, 0)
     + COALESCE(sv.flag_recouvrement, 0)
     + COALESCE(a.flag_contentieux, 0)                          AS score_risque,
 
-    
     CASE
         WHEN a.moy_mt_init_brut IS NULL OR a.moy_mt_init_brut = 0 THEN NULL
         ELSE ROUND((a.moy_mt_cap_rest / a.moy_mt_init_brut)::numeric, 4)
     END                                                         AS ratio_remboursement,
 
-    
     CASE
         WHEN s.anciennete_annees IS NULL THEN NULL
         WHEN s.anciennete_annees < 2     THEN 1
         ELSE 0
     END                                                         AS flag_nouveau_client,
 
-    
     CASE
         WHEN sv.date_dernier_sav IS NULL THEN NULL
         WHEN TO_TIMESTAMP(NULLIF(TRIM(sv.date_dernier_sav::text),''),
@@ -201,8 +214,6 @@ SELECT
                                   'DDMONYYYY:HH24:MI:SS'))::numeric
     END                                                         AS recence_sav,
 
-    
-    
     CASE
         WHEN r.date_derniere_recla IS NULL THEN NULL
         WHEN TO_TIMESTAMP(NULLIF(TRIM(r.date_derniere_recla::text),''),
@@ -212,8 +223,6 @@ SELECT
                                   'DDMONYYYY:HH24:MI:SS'))::numeric
     END                                                         AS recence_recla,
 
-    
-    
     CASE
         WHEN d.date_derniere_demande IS NULL THEN NULL
         WHEN TO_TIMESTAMP(NULLIF(TRIM(d.date_derniere_demande::text),''),
@@ -224,14 +233,9 @@ SELECT
     END                                                         AS recence_demande
 
 FROM f
-
-
 LEFT JOIN s  ON f.tiers_client    = s.tiers_client    AND f.periode_trt = s.periode_trt
 LEFT JOIN a  ON f.tiers_client    = a.tiers_client    AND f.periode_trt = a.periode_trt
-
-
-LEFT JOIN c ON f.tiers_client = c.tiers_client
-           AND f.periode_trt  = c.periode_trt
+LEFT JOIN c  ON f.tiers_client    = c.tiers_client    AND f.periode_trt = c.periode_trt
 LEFT JOIN sv ON s.id_tiers_siebel = sv.id_tiers_siebel
 LEFT JOIN r  ON s.id_tiers_siebel = r.id_tiers_siebel
 LEFT JOIN d  ON s.id_tiers_siebel = d.id_tiers_siebel
