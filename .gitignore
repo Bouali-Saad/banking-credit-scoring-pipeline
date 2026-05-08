@@ -1,38 +1,152 @@
+# =====================================================
+# PFE Scoring Crédit - .gitignore
+# =====================================================
 
-*.csv
+# -----------------------------------------------------
+# Python
+# -----------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# -----------------------------------------------------
+# Environnements virtuels
+# -----------------------------------------------------
+venv/
+env/
+.venv/
+credit_scoring_env/
+.env
+.env.*
+
+# -----------------------------------------------------
+# Jupyter
+# -----------------------------------------------------
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+.jupyter/
+
+# -----------------------------------------------------
+# DONNEES (TROP LOURDES - jamais sur GitHub)
+# -----------------------------------------------------
+data/*.parquet
+data/*.csv
+data/X_train_parts/
+data/scoring_*.csv
+*.parquet
+*.feather
+!data/.gitkeep
+!data/README.md
+
+# -----------------------------------------------------
+# FICHIERS EXCEL DE TRAVAIL
+# -----------------------------------------------------
 *.xlsx
+*.xls
+*.xlsm
+Classeur*.xlsx
+~$*.xlsx
+~$*.xls
+
+# -----------------------------------------------------
+# MODELES ML (LOURDS)
+# -----------------------------------------------------
+models/*.pkl
+models/*.joblib
+models/*.h5
+models/*.pt
+models/*.onnx
 *.pkl
 *.joblib
-data/
-__pycache__/
-*.pyc
-.env
-credit_scoring_env/
-.ipynb_checkpoints/
-dbt/target/
-dbt/dbt_packages/
-dbt/logs/
-mlflow/mlruns/
-profiles.yml
-jars/ 
+!models/.gitkeep
+!models/README.md
 
-data/
-*.parquet
-*.csv
-*.pkl
-*.xlsx
-
-
-mlartifacts/
+# -----------------------------------------------------
+# MLflow
+# -----------------------------------------------------
 mlruns/
-
-
-.ipynb_checkpoints/
-
-
-__pycache__/
-*.pyc
-
+mlartifacts/
 mlflow.db
-mlruns/
-mlartifacts/
+
+# -----------------------------------------------------
+# CatBoost (logs auto-generes)
+# -----------------------------------------------------
+catboost_info/
+**/catboost_info/
+
+# -----------------------------------------------------
+# JAR files (drivers JDBC)
+# -----------------------------------------------------
+jars/
+*.jar
+
+# -----------------------------------------------------
+# dbt
+# -----------------------------------------------------
+dbt/pfe_scoring/target/
+dbt/pfe_scoring/dbt_packages/
+dbt/pfe_scoring/logs/
+.user.yml
+profiles.yml
+**/profiles.yml
+
+# -----------------------------------------------------
+# Streamlit
+# -----------------------------------------------------
+.streamlit/secrets.toml
+
+# -----------------------------------------------------
+# IDE / Editeurs
+# -----------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-*
+
+# -----------------------------------------------------
+# OS
+# -----------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+*.lnk
+
+# -----------------------------------------------------
+# Logs et temporaires
+# -----------------------------------------------------
+*.log
+*.tmp
+*.bak
+logs/
+tmp/
+
+# -----------------------------------------------------
+# Secrets / Credentials
+# -----------------------------------------------------
+secrets.yml
+secrets.json
+credentials.json
+config_local.py
+*.pem
+*.key
+
+# -----------------------------------------------------
+# Docker (Mois 5)
+# -----------------------------------------------------
+.docker-volumes/
+*.tar
+
+# -----------------------------------------------------
+# Airflow (Mois 6)
+# -----------------------------------------------------
+airflow/logs/
+airflow/airflow.db
+airflow/airflow-webserver.pid
+airflow/standalone_admin_password.txt
